@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@src/app.module.js';
+import { AppConfigService } from './config/config.service.js';
+import { ENV_VARIABLE } from './common/constants.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  await app.listen(process.env.PORT ?? 3000);
+  app.enableCors();
+  const appConfig = app.get(AppConfigService);
+  const PORT = appConfig.get(ENV_VARIABLE.PORT);
+  await app.listen(PORT ?? 3000);
 }
 await bootstrap();
