@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import type { Env } from 'src/config/schema/index.js';
+import type { Env } from './validation/env.validation.js';
+import EnvironmentVariables from './validation/env.validation.js';
 
 @Injectable()
 export class AppConfigService {
-  constructor(private readonly configService: ConfigService<Env, true>) {}
-  get<Key extends keyof Env>(key: Key) {
-    return this.configService.get<Env[Key]>(key);
+  constructor(
+    private readonly configService: ConfigService<EnvironmentVariables, true>,
+  ) {}
+  get<T extends Env>(key: T): EnvironmentVariables[T] {
+    return this.configService.get<EnvironmentVariables[T]>(key);
   }
 }
