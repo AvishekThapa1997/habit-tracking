@@ -12,7 +12,7 @@ NODE_ENV: z
 **/
 
 import { Logger } from '@nestjs/common';
-import { plainToInstance } from 'class-transformer';
+import { Expose, plainToInstance, Transform } from 'class-transformer';
 import {
   IsEnum,
   IsNumber,
@@ -46,27 +46,37 @@ const DEFAULT = {
 
 export default class EnvironmentVariables {
   @IsEnum(Environment)
-  NODE_ENV: Environment = DEFAULT.NODE_ENV;
+  @Expose()
+  @Transform(({ value }) => value ?? DEFAULT.NODE_ENV)
+  NODE_ENV: Environment;
 
   @IsEnum(AppState)
+  @Expose()
+  @Transform(({ value }) => value ?? DEFAULT.APP_STATE)
   APP_STATE: AppState = DEFAULT.APP_STATE;
 
   @IsNumber()
   @IsPositive()
+  @Expose()
+  @Transform(({ value }) => value ?? DEFAULT.PORT)
   PORT: number = DEFAULT.PORT;
 
   @IsString()
-  @Matches('/^postgresql:\/\//')
+  @Expose()
   DATABASE_URL: string;
 
   @IsString()
-  @Min(32)
+  @Expose()
   JWT_SECRET: string;
 
   @IsString()
-  JWT_EXPIRES_IN: string = DEFAULT.JWT_EXPIRES_IN;
+  @Transform(({ value }) => value ?? DEFAULT.JWT_EXPIRES_IN)
+  @Expose()
+  JWT_EXPIRES_IN: string;
 
   @IsNumber()
+  @Transform(({ value }) => value ?? DEFAULT.BCRYPT_ROUNDS)
+  @Expose()
   BCRYPT_ROUNDS: number = DEFAULT.BCRYPT_ROUNDS;
 }
 
@@ -75,7 +85,7 @@ export const validate = (config: Record<string, unknown>) => {
     enableImplicitConversion: true,
     excludeExtraneousValues: true,
   });
-
+  Logger.log(validatedConfig.JWT_SECRET.length);
   const errors = validateSync(validatedConfig);
   if (errors.length > 0) {
     const formattedErrors = errors.map((error) => {
