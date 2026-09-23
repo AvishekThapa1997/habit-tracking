@@ -78,6 +78,18 @@ export default class EnvironmentVariables {
   @Transform(({ value }) => value ?? DEFAULT.BCRYPT_ROUNDS)
   @Expose()
   BCRYPT_ROUNDS: number = DEFAULT.BCRYPT_ROUNDS;
+
+  @IsString()
+  @Expose()
+  SESSION_SECRET: string;
+
+  @IsString()
+  @Expose()
+  UPSTASH_REDIS_REST_URL: string;
+
+  @IsString()
+  @Expose()
+  UPSTASH_REDIS_REST_TOKEN: string;
 }
 
 export const validate = (config: Record<string, unknown>) => {

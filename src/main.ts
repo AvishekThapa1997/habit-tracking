@@ -1,11 +1,17 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@src/app.module.js';
-import { AppConfigService } from './config/config.service.js';
-import { ValidationPipe } from '@nestjs/common';
+import session from 'express-session';
 import { ResponseInterceptor } from './common/interceptor/response.interceptor.js';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
+import { AppConfigService } from './config/config.service.js';
+import { SESSION_STORE } from './auth/decorators/auth.decorator.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const appConfig = app.get(AppConfigService);
+  const sessionStore = app.get(SESSION_STORE);
+  const PORT = appConfig.get('PORT');
   app.setGlobalPrefix('api');
   app.enableCors();
   app.useGlobalPipes(
@@ -15,8 +21,22 @@ async function bootstrap() {
     }),
   );
   app.useGlobalInterceptors(new ResponseInterceptor());
-  const appConfig = app.get(AppConfigService);
-  const PORT = appConfig.get('PORT');
+
+  app.use(
+    session({
+      store: sessionStore,
+      secret: appConfig.get('SESSION_SECRET'),
+      resave: false,
+      saveUninitialized: false,
+      cookie: {
+        httpOnly: true,
+        secure: appConfig.get('NODE_ENV') === 'production',
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      },
+    }),
+  );
+  app.useGlobalFilters(new GlobalExceptionFilter());
   await app.listen(PORT ?? 3000);
 }
 await bootstrap();

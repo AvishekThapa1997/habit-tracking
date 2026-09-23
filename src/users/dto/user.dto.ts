@@ -4,8 +4,7 @@ import {
   IsInt,
   IsOptional,
   IsString,
-  Max,
-  Min,
+  Length,
 } from 'class-validator';
 
 export class UserDto implements Omit<User, 'password'> {
@@ -13,8 +12,7 @@ export class UserDto implements Omit<User, 'password'> {
   id: number;
 
   @IsString()
-  @Min(3)
-  @Max(30)
+  @Length(3, 30)
   userName: string;
 
   @IsString()

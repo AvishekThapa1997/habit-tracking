@@ -1,4 +1,5 @@
 import { AuthService } from '@/auth/auth.service.js';
+import { PasswordService } from '@/auth/providers/password.service.js';
 import { InjectDb } from '@/db/db.decorator.js';
 import type { Db } from '@/db/db.module.js';
 import { entries } from '@/db/schema/entries.js';
@@ -12,7 +13,7 @@ import { Inject, Injectable, Logger } from '@nestjs/common';
 export class SeedService {
   constructor(
     @InjectDb() private readonly db: Db,
-    @Inject() private readonly authService: AuthService,
+    @Inject() private readonly passwordService: PasswordService,
   ) {}
 
   async seed() {
@@ -30,7 +31,7 @@ export class SeedService {
 
       // Step 2: Create foundation data
       Logger.log('Creating demo users...');
-      const hashedPassword = await this.authService.hashPassword('demo123');
+      const hashedPassword = await this.passwordService.hashPassword('demo123');
 
       const [demoUser] = await db
         .insert(users)
