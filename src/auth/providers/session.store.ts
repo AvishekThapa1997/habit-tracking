@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { Redis } from '@upstash/redis';
 import { InjectRedis } from '@/redis/redis.decorator.js';
-import { CONSTANTS } from '../constants/auth.constants.js';
+import { AUTH_CONSTANTS } from '../constants/auth.constants.js';
 import { type SessionData, Store } from 'express-session';
 
 @Injectable()
 export class SessionStoreService extends Store {
-  private readonly prefix = CONSTANTS.SESSION_PREFIX;
-  private readonly ttl = CONSTANTS.SESSION_TTL;
+  private readonly prefix = AUTH_CONSTANTS.SESSION_PREFIX;
+  private readonly ttl = AUTH_CONSTANTS.SESSION_TTL;
 
   constructor(@InjectRedis() private readonly redis: Redis) {
     super();

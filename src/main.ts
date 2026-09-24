@@ -2,10 +2,10 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '@src/app.module.js';
 import session from 'express-session';
-import { ResponseInterceptor } from './common/interceptor/response.interceptor.js';
+import { SESSION_STORE } from './auth/constants/auth.constants.js';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter.js';
+import { ResponseInterceptor } from './common/interceptor/response.interceptor.js';
 import { AppConfigService } from './config/config.service.js';
-import { SESSION_STORE } from './auth/decorators/auth.decorator.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -36,6 +36,7 @@ async function bootstrap() {
       },
     }),
   );
+
   app.useGlobalFilters(new GlobalExceptionFilter());
   await app.listen(PORT ?? 3000);
 }

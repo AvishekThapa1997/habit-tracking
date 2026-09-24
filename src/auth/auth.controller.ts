@@ -1,15 +1,19 @@
+import { CreateUserDto } from '@/users/dto/create-user.dto.js';
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
-import type { Request } from 'express';
 import { AuthService } from './auth.service.js';
-import { CreateUserDto } from '@/users/dto/create-user.dto.js';
 import { LoginDto } from './dto/login.dto.js';
+import type { AuthRequest } from './types/index.js';
+import { Auth, Public, UserId } from './decorators/auth.decorator.js';
+import { UserDto } from '@/users/dto/user.dto.js';
 
 @Controller('auth')
 export class AuthController {
@@ -17,7 +21,11 @@ export class AuthController {
 
   @Post('/register')
   @HttpCode(HttpStatus.CREATED)
-  async register(@Body() createUserDto: CreateUserDto, @Req() req: Request) {
+  @Public()
+  async register(
+    @Body() createUserDto: CreateUserDto,
+    @Req() req: AuthRequest,
+  ) {
     const user = await this.authService.register(createUserDto);
     req.session.userId = user.id;
     return user;
@@ -25,9 +33,18 @@ export class AuthController {
 
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto, @Req() req: Request) {
+  @Public()
+  async login(@Body() loginDto: LoginDto, @Req() req: AuthRequest) {
     const user = await this.authService.login(loginDto);
     req.session.userId = user.id;
+    return user;
+  }
+
+  @Get('/session')
+  @HttpCode(HttpStatus.OK)
+  @Auth()
+  async getSession(@UserId() userId: UserDto['id']) {
+    const user = await this.authService.getSession(userId);
     return user;
   }
 }

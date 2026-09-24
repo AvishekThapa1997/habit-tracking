@@ -12,6 +12,7 @@ import { CreateUserDto } from '@/users/dto/create-user.dto.js';
 import { UserDto } from '@/users/dto/user.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { eq } from 'drizzle-orm';
+import { UserSession } from './types/index.js';
 
 @Injectable()
 export class AuthService {
@@ -65,6 +66,17 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
+    return UserDto.fromDomain(user);
+  }
+
+  async getSession(userId?: UserDto['id']): Promise<UserDto> {
+    if (!userId) {
+      throw new UnauthorizedException('Unauthorized');
+    }
+    const [user] = await this.db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId));
     return UserDto.fromDomain(user);
   }
 }

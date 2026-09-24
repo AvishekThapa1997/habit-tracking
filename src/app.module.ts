@@ -18,6 +18,7 @@ import { AuthModule } from './auth/auth.module.js';
     SeedModule,
     RedisModule,
     AuthModule,
+    
   ],
   controllers: [AppController],
   providers: [AppService],
