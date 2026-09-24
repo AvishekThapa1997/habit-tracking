@@ -97,7 +97,6 @@ export const validate = (config: Record<string, unknown>) => {
     enableImplicitConversion: true,
     excludeExtraneousValues: true,
   });
-  Logger.log(validatedConfig.JWT_SECRET.length);
   const errors = validateSync(validatedConfig);
   if (errors.length > 0) {
     const formattedErrors = errors.map((error) => {

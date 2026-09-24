@@ -77,6 +77,9 @@ export class AuthService {
       .select()
       .from(users)
       .where(eq(users.id, userId));
+    if (!user) {
+      throw new UnauthorizedException('Unauthorized');
+    }
     return UserDto.fromDomain(user);
   }
 }
